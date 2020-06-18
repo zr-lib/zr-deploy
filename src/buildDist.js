@@ -1,10 +1,8 @@
 'use strict';
 
-const ora = require('ora');
-const chalk = require('chalk');
 const { promisify } = require('util');
 const { spawn } = require('child_process');
-const { textError } = require('./utils/textConsole');
+const { textError, textSuccess } = require('./utils/textConsole');
 
 /**
  * 执行脚本 spawn 的封装
@@ -14,20 +12,20 @@ const { textError } = require('./utils/textConsole');
 async function buildDist(cmd, params, next) {
   const build = spawn(cmd, params, {
     shell: process.platform === 'win32', // 兼容windows系统
+    stdio: 'inherit', // 打印命令原始输出
   });
 
-  const spinner = ora(chalk.cyan('正在打包... \n')).start();
-
-  build.on('error', (code) => {
-    spinner.fail(chalk.red('打包失败！\n'));
-    textError(`build process close all stdio with code ${code}`);
+  build.on('error', () => {
+    textError(`× [script: ${cmd} ${params}] 打包失败！\n`);
     process.exit(1);
   });
 
   build.on('close', (code) => {
-    spinner.succeed(chalk.green('打包完成！\n'));
-    if (code !== 0) {
-      textError(`build process exited with code ${code}`);
+    if (code === 0) {
+      textSuccess('√ 打包完成！\n');
+    } else {
+      textError(`× [script: ${cmd} ${params}] 打包失败！\n`);
+      process.exit(1);
     }
     // 必传，promisify 回调继续执行后续函数
     if (next) next();

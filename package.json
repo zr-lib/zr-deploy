@@ -23,6 +23,8 @@
     "zip-local": "^0.3.4"
   },
   "devDependencies": {
-    "chalk": "^4.1.0"
+    "chalk": "^4.1.0",
+    "inquirer": "^7.2.0",
+    "jest": "^26.0.1"
   }
 }
