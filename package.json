@@ -1,0 +1,28 @@
+{
+  "name": "zr-deploy",
+  "version": "1.0.0",
+  "description": "Web FrontEnd Spa Deploy",
+  "repository": "https://github.com/zero9527/zr-deploy.git",
+  "main": "src/index.js",
+  "bin": {
+    "zr-deploy": "./bin/zr-deploy.js"
+  },
+  "scripts": {
+    "deploy": "node ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "spa",
+    "deploy"
+  ],
+  "author": "zero9527",
+  "license": "ISC",
+  "dependencies": {
+    "node-ssh": "^10.0.2",
+    "ora": "^4.0.4",
+    "zip-local": "^0.3.4"
+  },
+  "devDependencies": {
+    "chalk": "^4.1.0"
+  }
+}
