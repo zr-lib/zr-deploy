@@ -1,11 +1,11 @@
 const fs = require('fs');
-const path = require('path');
 const { textInfo, textError } = require('./utils/textConsole');
+const { resolvePath } = require('./utils');
 
 // 获取配置
-function getConfig() {
-  const configFile = path.resolve(process.cwd(), './zr-deploy-config.json');
-  if (!fs.existsSync(configFile)) {
+function getConfig(testConfigJSON = null) {
+  const configFile = resolvePath(process.cwd(), './zr-deploy-config.json');
+  if (!testConfigJSON && !fs.existsSync(configFile)) {
     textError(`${configFile} 不存在！`);
     textInfo(`请先在项目根目录新建"zr-deploy-config.json"，内容如下：
     [
@@ -29,7 +29,7 @@ function getConfig() {
     `);
     process.exit(1);
   }
-  let config = fs.readFileSync(configFile);
+  let config = testConfigJSON || fs.readFileSync(configFile);
   try {
     config = JSON.parse(config);
     const localKeys = ['buildCommand', 'distDir', 'distZip'];

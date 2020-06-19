@@ -1,12 +1,12 @@
 'use strict';
 
-const path = require('path');
 const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const { textError, textInfo } = require('./utils/textConsole');
 const getTime = require('./utils/getTime');
+const { resolvePath } = require('./utils');
+const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();
 
@@ -53,8 +53,12 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     bakeup,
   } = SERVER_CONFIG;
 
-  if (!distZipName || distDir === '/') {
-    textError('请正确配置config.json!');
+  if (!host || !username || !password || !distDir || !distZipName) {
+    textError('请正确配置zr-deploy-config.json!');
+    process.exit(1);
+  }
+  if (!distDir.startsWith('/') || distDir === '/') {
+    textError(`[server.distDir: ${distDir}] 需为绝对路径，且不能为根目录"/"`);
     process.exit(1);
   }
 
@@ -70,7 +74,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   try {
     // 上传压缩的项目文件
     await SSH.putFile(
-      path.resolve(process.cwd(), LOCAL_CONFIG.distZip),
+      resolvePath(process.cwd(), LOCAL_CONFIG.distZip),
       `${distDir}/${distZipName}.zip`
     );
 

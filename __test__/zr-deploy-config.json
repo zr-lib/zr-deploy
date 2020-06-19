@@ -1,0 +1,18 @@
+[
+  {
+    "local": {
+      "buildCommand": "mkdir ../testDist",
+      "distDir": "./testDist",
+      "distZip": "./testDist.zip"
+    },
+    "server": {
+      "name": "服务器1",
+      "host": "0.0.0.0",
+      "username": "username",
+      "password": "password",
+      "distDir": "/var/www/xxx/xxx",
+      "distZipName": "dist",
+      "bakeup": false
+    }
+  }
+]
