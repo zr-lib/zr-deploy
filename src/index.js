@@ -24,7 +24,6 @@ const deploy = require('./deploy');
 
 async function start() {
   const CONFIG = await selectEnv(getConfig());
-  console.log('CONFIG: ', CONFIG);
   if (!CONFIG) process.exit(1);
 
   textTitle('======== 自动部署项目 ========');

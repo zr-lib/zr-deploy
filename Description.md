@@ -1,6 +1,6 @@
 # zr-deploy
-Web前端项目部署脚本
 
+Web 前端项目部署脚本
 
 ## 前言
 
@@ -17,13 +17,14 @@ Web前端项目部署脚本
 - 解压缩项目文件
 - 部署成功
 
+![预览图](https://s1.ax1x.com/2020/06/19/NMVyiF.gif)
 
 已发布 `npm`，👉[zr-deploy](https://www.npmjs.com/package/zr-deploy)
 
 源码 `github`，👉[zr-deploy](https://github.com/zero9527/zr-deploy)
 
-
 ## 使用
+
 ### 下载
 
 > 注意 加 `-g`/`global` 下载到全局，不然会提示找不到命令！
@@ -33,15 +34,19 @@ Web前端项目部署脚本
 ```shell
 npm i -g zr-deploy
 ```
+
 或
+
 ```shell
 yarn global add zr-deploy
 ```
 
 然后在 **项目根目录** 新建配置文件 `zr-deploy-config.json`，
+
 > 记住 加到 `.gitignore`，不要把它上传到 `github` 上面了
 
 ### 执行
+
 进入项目目录
 
 ```shell
@@ -49,21 +54,24 @@ zr-deploy
 ```
 
 ### 配置文件
+
 - `local`
-    - `buildCommand`: 打包命令
-    - `distDir`: 本地打包输出的路径
-    - `distZip`: 压缩打包文件的文件名
+
+  - `buildCommand`: 打包命令
+  - `distDir`: 本地打包输出的路径
+  - `distZip`: 压缩打包文件的文件名
 
 - `server`
-    - `name`: 选择的名字
-    - `host`: 服务器IP
-    - `username`: 服务器的登录用户名
-    - `password`: 对应用户名的密码
-    - `distDir`: 项目路径
-    - `distZipName`: 上传的压缩文件名
-    - `bakeup`: 是否备份旧目录
+  - `name`: 选择的名字
+  - `host`: 服务器 IP
+  - `username`: 服务器的登录用户名
+  - `password`: 对应用户名的密码
+  - `distDir`: 项目路径
+  - `distZipName`: 上传的压缩文件名
+  - `bakeup`: 是否备份旧目录
 
 `zr-deploy-config.json` 格式如下
+
 ```json
 [
   {
@@ -101,10 +109,10 @@ zr-deploy
 ]
 ```
 
-
 ## 工具说明
 
-###  目录结构
+### 目录结构
+
 ```
 .
 ├── bin
@@ -130,6 +138,7 @@ zr-deploy
 ```
 
 ### 部署脚本入口
+
 ```js
 // src\index.js
 'use strict';
@@ -158,7 +167,6 @@ const deploy = require('./deploy');
 
 async function start() {
   const CONFIG = await selectEnv(getConfig());
-  console.log('CONFIG: ', CONFIG);
   if (!CONFIG) process.exit(1);
 
   textTitle('======== 自动部署项目 ========');
@@ -177,6 +185,7 @@ module.exports = start;
 ```
 
 ### 多个项目环境
+
 使用 [inquirer](https://www.npmjs.com/package/inquirer)，从配置文件中选择
 
 ```js
@@ -210,11 +219,13 @@ module.exports = selectEnv;
 ```
 
 ### 压缩文件
+
 ```shell
 yarn add zip-local
 ```
 
 ### 进度工具
+
 ```shell
 yarn add ora
 ```
@@ -231,6 +242,7 @@ spinner.fail(chalk.red('打包失败！\n'));
 ```
 
 ### util.promisify
+
 将`node.js` 内置函数转化为 `Promise` 形式， `promisify` 包装一下，方便使用 `async`/`await`，记住要调用一下 `next()`，相当于 `Promise.resolve()`，不然是不会走到下一步的
 
 > 注意：普通函数（非 `node.js` 内置）使用 `promisify`，调用 `next`，不传参数没问题，传参数给 `next(arg)` 时，会走到 `catch` 去，跟 手动 `new Promise()` 对比一下，哪个方便使用哪个就是了
@@ -239,15 +251,17 @@ spinner.fail(chalk.red('打包失败！\n'));
 const { promisify } = require('util');
 
 async function buildDist(cmd, params, next) {
-    // ... 
-    if (next) next();
+  // ...
+  if (next) next();
 }
 
 module.exports = promisify(buildDist);
 ```
 
 ### ssh 连接服务器
+
 使用 `node-ssh` 连接服务器
+
 ```shell
 yarn add node-ssh
 ```
@@ -290,9 +304,9 @@ async function runCommand(cmd, cwd) {
 }
 ```
 
-
 ## 打包代码 buildDist
-可以用 `child_process.spawn` 执行 `shell` 命令 `npm/yarn build` 
+
+可以用 `child_process.spawn` 执行 `shell` 命令 `npm/yarn build`
 
 > `spawn` 的格式是 `child_process.spawn(command[, args][, options])`，以数组的形式传参
 
@@ -335,7 +349,7 @@ async function buildDist(cmd, params, next) {
 module.exports = promisify(buildDist);
 ```
 
-## 压缩打包好的代码 compressDist
+## 压缩文件 compressDist
 
 ```js
 // src\compressDist.js
@@ -379,11 +393,13 @@ module.exports = promisify(compressDist);
 ```
 
 ## 连接服务器、部署项目
+
 ```shell
 yarn add node-ssh
 ```
 
 ### 连接成功后
+
 - 上传代码
 - 配置文件夹权限
 - 备份原来的项目（`server.bakeup` 为 `true`）
@@ -458,9 +474,6 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   await connectServer({ host, username, password });
   // privateKey: '/home/steel/.ssh/id_rsa'
 
-  textInfo(`项目路径: ${distDir}`);
-  textInfo('');
-
   const spinner = ora(chalk.cyan('正在部署项目...\n')).start();
 
   try {
@@ -491,7 +504,9 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     await runCommand(`rm -rf ./${distZipName}.zip`, distDir);
 
     spinner.succeed(chalk.green('部署完成！\n'));
+    textInfo(`项目路径: ${distDir}`);
     textInfo(new Date());
+    textInfo('');
     if (next) next();
   } catch (err) {
     spinner.fail(chalk.red('项目部署失败！\n'));
@@ -503,6 +518,6 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
 module.exports = promisify(deploy);
 ```
 
-
 ## 大功告成
+
 没有意外的话，退出进程，然后就部署好了

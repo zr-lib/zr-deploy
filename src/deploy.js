@@ -66,9 +66,6 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   await connectServer({ host, username, password });
   // privateKey: '/home/steel/.ssh/id_rsa'
 
-  textInfo(`项目路径: ${distDir}`);
-  textInfo('');
-
   const spinner = ora(chalk.cyan('正在部署项目...\n')).start();
 
   try {
@@ -99,7 +96,9 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     await runCommand(`rm -rf ./${distZipName}.zip`, distDir);
 
     spinner.succeed(chalk.green('部署完成！\n'));
+    textInfo(`项目路径: ${distDir}`);
     textInfo(new Date());
+    textInfo('');
     if (next) next();
   } catch (err) {
     spinner.fail(chalk.red('项目部署失败！\n'));
