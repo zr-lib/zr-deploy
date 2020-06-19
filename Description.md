@@ -17,11 +17,11 @@ Web前端项目部署脚本
 - 解压缩项目文件
 - 部署成功
 
-![](https://user-gold-cdn.xitu.io/2020/6/14/172b26c80b771acc?w=847&h=515&f=gif&s=927742)
 
 已发布 `npm`，👉[zr-deploy](https://www.npmjs.com/package/zr-deploy)
 
-源码 `github` 戳👉[zr-deploy](https://github.com/zero9527/zr-deploy)
+源码 `github`，👉[zr-deploy](https://github.com/zero9527/zr-deploy)
+
 
 ## 使用
 ### 下载
@@ -34,11 +34,18 @@ Web前端项目部署脚本
 ```shell
 npm i -g zr-deploy
 ```
+或
+```shell
+yarn global add zr-deploy
+```
 
-然后在**根目录**新建 配置文件 `zr-deploy-config.json`，
+
+然后在 **项目根目录** 新建配置文件 `zr-deploy-config.json`，
 > 记住 加到 `.gitignore`，不要把它上传到 `github` 上面了
 
 ### 执行
+进入项目目录
+
 ```shell
 zr-deploy
 ```
@@ -58,7 +65,7 @@ zr-deploy
     - `distZipName`: 上传的压缩文件名
     - `bakeup`: 是否备份旧目录
 
-格式如下
+`zr-deploy-config.json` 格式如下
 ```json
 [
   {
@@ -104,6 +111,8 @@ zr-deploy
 .
 ├── bin
 |  └── zr-deploy.js
+├── CHANGE_LOG.md
+├── Desc.md
 ├── package-lock.json
 ├── package.json
 ├── README.md
@@ -116,13 +125,15 @@ zr-deploy
 |  ├── index.js
 |  ├── selectEnv.js
 |  └── utils
+|     ├── getTime.js
+|     └── textConsole.js
 └── __test__
    └── index.test.js
 ```
 
 ### 部署脚本入口
 ```js
-// deploy/index.js
+// src\index.js
 'use strict';
 
 /**
@@ -150,9 +161,8 @@ const deploy = require('./deploy');
 async function start() {
   const CONFIG = await selectEnv(getConfig());
   console.log('CONFIG: ', CONFIG);
-  if (!CONFIG) {
-    process.exit(1);
-  }
+  if (!CONFIG) process.exit(1);
+
   textTitle('======== 自动部署项目 ========');
   textInfo('');
 
@@ -201,10 +211,47 @@ function selectEnv(CONFIG) {
 module.exports = selectEnv;
 ```
 
+### 压缩文件
+```shell
+yarn add zip-local
+```
+
+### 进度工具
+```shell
+yarn add ora
+```
+
+调用 `ora` 返回值的 `succeed`/`fail` 会替换原来的参数值（`loading`）
+
+```js
+const chalk = require('chalk');
+const ora = require('ora');
+
+const spinner = ora(chalk.cyan('正在打包... \n')).start();
+spinner.succeed(chalk.green('打包完成！\n'));
+spinner.fail(chalk.red('打包失败！\n'));
+```
+
+### util.promisify
+将`node.js` 内置函数转化为 `Promise` 形式， `promisify` 包装一下，方便使用 `async`/`await`，记住要调用一下 `next()`，相当于 `Promise.resolve()`，不然是不会走到下一步的
+
+> 注意：普通函数（非 `node.js` 内置）使用 `promisify`，调用 `next`，不传参数没问题，传参数给 `next(arg)` 时，会走到 `catch` 去，跟 手动 `new Promise()` 对比一下，哪个方便使用哪个就是了
+
+```js
+const { promisify } = require('util');
+
+async function buildDist(cmd, params, next) {
+    // ... 
+    if (next) next();
+}
+
+module.exports = promisify(buildDist);
+```
+
 ### ssh 连接服务器
 使用 `node-ssh` 连接服务器
 ```shell
-yarn add -D node-ssh
+yarn add node-ssh
 ```
 
 ```js
@@ -243,43 +290,6 @@ async function runCommand(cmd, cwd) {
     },
   });
 }
-```
-
-### 压缩文件
-```shell
-yarn add -D zip-local
-```
-
-### 进度工具
-```shell
-yarn add -D ora
-```
-
-调用 `ora` 返回值的 `succeed`/`fail` 会替换原来的参数值（`loading`）
-
-```js
-const chalk = require('chalk');
-const ora = require('ora');
-
-const spinner = ora(chalk.cyan('正在打包... \n')).start();
-spinner.succeed(chalk.green('打包完成！\n'));
-spinner.fail(chalk.red('打包失败！\n'));
-```
-
-### promisify
-将`node.js` 内置函数转化为 `Promise` 形式， `promisify` 包装一下，方便使用 `async`/`await`，记住要调用一下 `next()`，相当于 `Promise.resolve()`，不然是不会走到下一步的
-
-> 注意：普通函数（非 `node.js` 内置）使用 `promisify`，调用 `next`，不传参数没问题，传参数给 `next(arg)` 时，会走到 `catch` 去，跟 手动 `new Promise()` 对比一下，哪个方便使用哪个就是了
-
-```js
-const { promisify } = require('util');
-
-async function buildDist(cmd, params, next) {
-    // ... 
-    if (next) next();
-}
-
-module.exports = promisify(buildDist);
 ```
 
 
@@ -370,29 +380,31 @@ function compressDist(LOCAL_CONFIG, next) {
 module.exports = promisify(compressDist);
 ```
 
-## 连接服务器
+## 连接服务器、部署项目
 ```shell
-yarn add -D node-ssh
+yarn add node-ssh
 ```
 
 ### 连接成功后
 - 上传代码
 - 配置文件夹权限
-- 备份原来的项目（有配置 `server.bakeup` 为 `true` 话）
-- 删除原来的项目（有配置 `server.bakeup` 为 `false` 话）
+- 备份原来的项目（`server.bakeup` 为 `true`）
+- 删除原来的项目（`server.bakeup` 为 `false`）
 - 解压缩上传的项目压缩文件
 - 解压缩完成后，删除压缩文件
 - 部署成功
 
 ```js
+// src\deploy.js
 'use strict';
 
 const path = require('path');
-const promisfy = require('util').promisify;
+const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const { textError, textInfo, textSuccess } = require('./utils/textConsole');
+const { textError, textInfo } = require('./utils/textConsole');
+const getTime = require('./utils/getTime');
 
 const SSH = new node_ssh();
 
@@ -440,7 +452,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   } = SERVER_CONFIG;
 
   if (!distZipName || distDir === '/') {
-    textError('请正确配置config.json!');
+    textError('请正确配置zr-deploy-config.json!');
     process.exit(1);
   }
 
@@ -460,16 +472,16 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
       `${distDir}/${distZipName}.zip`
     );
 
-    // 备份重命名原项目的文件
     if (bakeup) {
+      // 备份重命名原项目的文件
       await runCommand(
-        `mv ${distDir} ${distDir}-${new Date().toDateString()}`,
+        `mv ${distZipName} ${distZipName}_${getTime()}`,
         distDir
       );
+    } else {
+      // 删除原项目的文件
+      await runCommand(`rm -rf ${distZipName}`, distDir);
     }
-
-    // 删除原项目的文件
-    await runCommand(`rm -rf ${distZipName}`, distDir);
 
     // 修改文件权限
     await runCommand(`chmod 777 ${distZipName}.zip`, distDir);
@@ -490,9 +502,9 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   }
 }
 
-module.exports = promisfy(deploy);
+module.exports = promisify(deploy);
 ```
 
 
-## 大公告成
+## 大功告成
 没有意外的话，退出进程，然后就部署好了

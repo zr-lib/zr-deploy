@@ -1,11 +1,12 @@
 'use strict';
 
 const path = require('path');
-const promisfy = require('util').promisify;
+const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const { textError, textInfo, textSuccess } = require('./utils/textConsole');
+const { textError, textInfo } = require('./utils/textConsole');
+const getTime = require('./utils/getTime');
 
 const SSH = new node_ssh();
 
@@ -76,7 +77,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     if (bakeup) {
       // 备份重命名原项目的文件
       await runCommand(
-        `mv ${distZipName} ${distZipName}-${new Date().toDateString()}`,
+        `mv ${distZipName} ${distZipName}_${getTime()}`,
         distDir
       );
     } else {
@@ -103,4 +104,4 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   }
 }
 
-module.exports = promisfy(deploy);
+module.exports = promisify(deploy);
