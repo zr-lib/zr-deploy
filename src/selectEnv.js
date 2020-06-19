@@ -1,23 +1,26 @@
-const { promisify } = require('util');
 const inquirer = require('inquirer');
 
-// 选择部署环境
-async function selectEnv(CONFIG, next) {
-  console.log(CONFIG);
-  const choices = CONFIG.servers.map((item, index) => ({
-    name: `${item.serverName} ${item.host}`,
-    value: index,
-  }));
-  const select = await inquirer.prompt({
-    name: '选择部署的服务器',
-    choices,
-    type: 'list',
+/**
+ * 选择部署环境
+ * @param {*} CONFIG 配置文件内容
+ */
+function selectEnv(CONFIG) {
+  return new Promise(async (resolve, reject) => {
+    const select = await inquirer.prompt({
+      type: 'list',
+      name: '选择部署的服务器',
+      choices: CONFIG.map((item, index) => ({
+        name: `${item.server.name}`,
+        value: index,
+      })),
+    });
+    const selectServer = CONFIG[Object.values(select)[0]];
+    if (selectServer) {
+      resolve(selectServer);
+    } else {
+      reject();
+    }
   });
-  const selectServer = CONFIG.servers[Object.values(select)[0]];
-  console.log('selectServer: ', selectServer);
-
-  const realConfig = { local: CONFIG.local, server: selectServer };
-  if (next) next(realConfig);
 }
 
-module.exports = promisify(selectEnv);
+module.exports = selectEnv;

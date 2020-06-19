@@ -1,19 +1,23 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 const ora = require('ora');
 const zipper = require('zip-local');
 const { promisify } = require('util');
 const { textError } = require('./utils/textConsole');
-const { existsSync } = require('fs');
 
-// 压缩打包好的项目
+/**
+ * 压缩打包好的项目
+ * @param {*} LOCAL_CONFIG 本地配置
+ * @param {*} next
+ */
 function compressDist(LOCAL_CONFIG, next) {
   try {
     const { distDir, distZip } = LOCAL_CONFIG;
     const dist = path.resolve(process.cwd(), distDir);
-    if (!existsSync(dist)) {
+    if (!fs.existsSync(dist)) {
       textError('× 压缩失败');
       textError(`× 打包路径 [local.distDir] 配置错误，${dist} 不存在！\n`);
       process.exit(1);

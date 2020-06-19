@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 自动部署项目
+ * 前端自动部署项目脚本
  */
 const { textTitle, textInfo } = require('./utils/textConsole');
 const getConfig = require('./getConfig');
@@ -23,22 +23,13 @@ const deploy = require('./deploy');
 /* =================== 5、部署项目 =================== */
 
 async function start() {
-  const CONFIG = await selectEnv(getConfig())
-    .then((res) => {
-      console.log('res: ', res);
-    })
-    .catch((err) => {
-      console.error('err: ', err);
-    });
-  console.log('selectEnv: ', CONFIG);
+  const CONFIG = await selectEnv(getConfig());
+  console.log('CONFIG: ', CONFIG);
   if (!CONFIG) {
     process.exit(1);
   }
   textTitle('======== 自动部署项目 ========');
   textInfo('');
-
-  // 部署环境，选择
-  // 备份服务器上旧项目文件，选择
 
   const [npm, ...script] = CONFIG.local.buildCommand.split(' ');
 

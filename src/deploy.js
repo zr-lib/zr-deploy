@@ -43,7 +43,14 @@ async function runCommand(cmd, cwd) {
 
 /* =================== 4、部署项目 =================== */
 async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
-  const { host, username, password, distDir, distZipName } = SERVER_CONFIG;
+  const {
+    host,
+    username,
+    password,
+    distDir,
+    distZipName,
+    bakeup,
+  } = SERVER_CONFIG;
 
   if (!distZipName || distDir === '/') {
     textError('请正确配置config.json!');
@@ -66,11 +73,16 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
       `${distDir}/${distZipName}.zip`
     );
 
-    // 备份重命名原项目的文件
-    // await runCommand(`mv ${distZipName} ${distZipName}-${Date.now()}`, distDir);
-
-    // 删除原项目的文件
-    await runCommand(`rm -rf ${distZipName}`, distDir);
+    if (bakeup) {
+      // 备份重命名原项目的文件
+      await runCommand(
+        `mv ${distZipName} ${distZipName}-${new Date().toDateString()}`,
+        distDir
+      );
+    } else {
+      // 删除原项目的文件
+      await runCommand(`rm -rf ${distZipName}`, distDir);
+    }
 
     // 修改文件权限
     await runCommand(`chmod 777 ${distZipName}.zip`, distDir);

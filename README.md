@@ -3,12 +3,18 @@
 
 Web FrontEnd Spa, deploy script
 
+
 ## Install
 ```shell
-npm i -D zr-deploy
+npm i -g zr-deploy
 ```
 
+
 ## Run
+cd project directory
 ```shell
 zr-deploy
 ```
+
+## Desc
+[Desc](./Desc.md)

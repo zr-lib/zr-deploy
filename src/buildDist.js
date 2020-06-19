@@ -24,7 +24,7 @@ async function buildDist(cmd, params, next) {
     if (code === 0) {
       textSuccess('√ 打包完成！\n');
     } else {
-      textError(`× [script: ${cmd} ${params}] 打包失败！\n`);
+      textError(`× 打包失败！[script: ${cmd} ${params}]\n`);
       process.exit(1);
     }
     // 必传，promisify 回调继续执行后续函数
