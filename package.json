@@ -1,6 +1,6 @@
 {
   "name": "zr-deploy",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "description": "Web FrontEnd Spa Deploy",
   "repository": "https://github.com/zero9527/zr-deploy.git",
   "main": "src/index.js",

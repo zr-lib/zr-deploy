@@ -23,7 +23,7 @@ Web 前端项目部署脚本
 
 源码 `github`，👉[zr-deploy](https://github.com/zero9527/zr-deploy)
 
-## 使用
+## 工具使用
 
 ### 下载
 
@@ -115,73 +115,43 @@ zr-deploy
 
 ```
 .
-├── bin
-|  └── zr-deploy.js
 ├── CHANGE_LOG.md
-├── Desc.md
-├── package-lock.json
-├── package.json
+├── Description.md
 ├── README.md
 ├── README_zh.md
-├── src
-|  ├── buildDist.js
-|  ├── compressDist.js
-|  ├── deploy.js
-|  ├── getConfig.js
-|  ├── index.js
-|  ├── selectEnv.js
-|  └── utils
-|     ├── getTime.js
-|     └── textConsole.js
-└── __test__
-   └── index.test.js
+├── __test__
+│   ├── buildDist.t.js
+│   ├── compressDist.t.js
+│   ├── getConfig.t.js
+│   ├── index.test.js
+│   └── zr-deploy-config.json
+├── bin
+│   └── zr-deploy.js
+├── package-lock.json
+├── package.json
+└── src
+    ├── buildDist.js
+    ├── compressDist.js
+    ├── deploy.js
+    ├── getConfig.js
+    ├── index.js
+    ├── selectEnv.js
+    └── utils
+        ├── getTime.js
+        ├── index.js
+        └── textConsole.js
 ```
 
-### 部署脚本入口
+### 项目打包
 
 ```js
-// src\index.js
-'use strict';
+// src/buildDist.js
+const { spawn } = require('child_process');
 
-/**
- * 前端自动部署项目脚本
- */
-const { textTitle, textInfo } = require('./utils/textConsole');
-const getConfig = require('./getConfig');
-const selectEnv = require('./selectEnv');
-const buildDist = require('./buildDist');
-const compressDist = require('./compressDist');
-const deploy = require('./deploy');
-
-/* =================== 0、获取配置 =================== */
-
-/* =================== 1、选择部署环境 =================== */
-
-/* =================== 2、项目打包 =================== */
-
-/* =================== 3、项目压缩 =================== */
-
-/* =================== 4、连接服务器 =================== */
-
-/* =================== 5、部署项目 =================== */
-
-async function start() {
-  const CONFIG = await selectEnv(getConfig());
-  if (!CONFIG) process.exit(1);
-
-  textTitle('======== 自动部署项目 ========');
-  textInfo('');
-
-  const [npm, ...script] = CONFIG.local.buildCommand.split(' ');
-
-  // await buildDist('yarn', ['build']);
-  await buildDist(npm, [...script]);
-  await compressDist(CONFIG.local);
-  await deploy(CONFIG.local, CONFIG.server);
-  process.exit();
-}
-
-module.exports = start;
+const build = spawn(cmd, params, {
+  shell: process.platform === 'win32', // 兼容windows系统
+  stdio: 'inherit', // 打印命令原始输出
+});
 ```
 
 ### 多个项目环境
@@ -230,7 +200,7 @@ yarn add zip-local
 yarn add ora
 ```
 
-调用 `ora` 返回值的 `succeed`/`fail` 会替换原来的参数值（`loading`）
+调用 `ora` 返回值的 `succeed`/`fail` 会替换原来的参数值（`loading`）在终端上显示
 
 ```js
 const chalk = require('chalk');
@@ -272,6 +242,7 @@ const node_ssh = require('node-ssh');
 
 const SSH = new node_ssh();
 
+/* =================== 3、连接服务器 =================== */
 /**
  * 连接服务器
  * @param {*} params { host, username, password }
@@ -302,6 +273,53 @@ async function runCommand(cmd, cwd) {
     },
   });
 }
+```
+
+## 部署脚本入口 start
+
+```js
+// src\index.js
+'use strict';
+
+/**
+ * 前端自动部署项目脚本
+ */
+const { textTitle, textInfo } = require('./utils/textConsole');
+const getConfig = require('./getConfig');
+const selectEnv = require('./selectEnv');
+const buildDist = require('./buildDist');
+const compressDist = require('./compressDist');
+const deploy = require('./deploy');
+
+/* =================== 0、获取配置 =================== */
+
+/* =================== 1、选择部署环境 =================== */
+
+/* =================== 2、项目打包 =================== */
+
+/* =================== 3、项目压缩 =================== */
+
+/* =================== 4、连接服务器 =================== */
+
+/* =================== 5、部署项目 =================== */
+
+async function start() {
+  const CONFIG = await selectEnv(getConfig());
+  if (!CONFIG) process.exit(1);
+
+  textTitle('======== 自动部署项目 ========');
+  textInfo('');
+
+  const [npm, ...script] = CONFIG.local.buildCommand.split(' ');
+
+  // await buildDist('yarn', ['build']);
+  await buildDist(npm, [...script]);
+  await compressDist(CONFIG.local);
+  await deploy(CONFIG.local, CONFIG.server);
+  process.exit();
+}
+
+module.exports = start;
 ```
 
 ## 打包代码 buildDist
@@ -356,12 +374,12 @@ module.exports = promisify(buildDist);
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const chalk = require('chalk');
 const ora = require('ora');
 const zipper = require('zip-local');
 const { promisify } = require('util');
 const { textError } = require('./utils/textConsole');
+const { resolvePath } = require('./utils');
 
 /**
  * 压缩打包好的项目
@@ -371,7 +389,7 @@ const { textError } = require('./utils/textConsole');
 function compressDist(LOCAL_CONFIG, next) {
   try {
     const { distDir, distZip } = LOCAL_CONFIG;
-    const dist = path.resolve(process.cwd(), distDir);
+    const dist = resolvePath(process.cwd(), distDir);
     if (!fs.existsSync(dist)) {
       textError('× 压缩失败');
       textError(`× 打包路径 [local.distDir] 配置错误，${dist} 不存在！\n`);
@@ -380,7 +398,7 @@ function compressDist(LOCAL_CONFIG, next) {
 
     const spinner = ora(chalk.cyan('正在压缩...\n')).start();
 
-    zipper.sync.zip(dist).compress().save(path.resolve(process.cwd(), distZip));
+    zipper.sync.zip(dist).compress().save(resolvePath(process.cwd(), distZip));
 
     spinner.succeed(chalk.green('压缩完成！\n'));
     if (next) next();
@@ -392,33 +410,23 @@ function compressDist(LOCAL_CONFIG, next) {
 module.exports = promisify(compressDist);
 ```
 
-## 连接服务器、部署项目
+## 连接服务器 connectServer
 
 ```shell
 yarn add node-ssh
 ```
 
-### 连接成功后
-
-- 上传代码
-- 配置文件夹权限
-- 备份原来的项目（`server.bakeup` 为 `true`）
-- 删除原来的项目（`server.bakeup` 为 `false`）
-- 解压缩上传的项目压缩文件
-- 解压缩完成后，删除压缩文件
-- 部署成功
-
 ```js
 // src\deploy.js
 'use strict';
 
-const path = require('path');
 const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const { textError, textInfo } = require('./utils/textConsole');
 const getTime = require('./utils/getTime');
+const { resolvePath } = require('./utils');
+const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();
 
@@ -456,6 +464,56 @@ async function runCommand(cmd, cwd) {
 
 /* =================== 4、部署项目 =================== */
 async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
+  // ...
+}
+
+module.exports = promisify(deploy);
+```
+
+## 部署项目 deploy
+
+- 上传代码
+- 配置文件夹权限
+- 备份原来的项目（`server.bakeup` 为 `true`）
+- 删除原来的项目（`server.bakeup` 为 `false`）
+- 解压缩上传的项目压缩文件
+- 解压缩完成后，删除压缩文件
+- 部署成功
+
+```js
+// src\deploy.js
+'use strict';
+
+const { promisify } = require('util');
+const ora = require('ora');
+const chalk = require('chalk');
+const node_ssh = require('node-ssh');
+const getTime = require('./utils/getTime');
+const { resolvePath } = require('./utils');
+const { textError, textInfo } = require('./utils/textConsole');
+
+const SSH = new node_ssh();
+
+/* =================== 3、连接服务器 =================== */
+/**
+ * 连接服务器
+ * @param {*} params { host, username, password }
+ */
+async function connectServer(params) {
+  // ...
+}
+
+/**
+ * 通过 ssh 在服务器上命令
+ * @param {*} cmd shell 命令
+ * @param {*} cwd 路径
+ */
+async function runCommand(cmd, cwd) {
+  // ...
+}
+
+/* =================== 4、部署项目 =================== */
+async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   const {
     host,
     username,
@@ -479,7 +537,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   try {
     // 上传压缩的项目文件
     await SSH.putFile(
-      path.resolve(process.cwd(), LOCAL_CONFIG.distZip),
+      resolvePath(process.cwd(), LOCAL_CONFIG.distZip),
       `${distDir}/${distZipName}.zip`
     );
 
