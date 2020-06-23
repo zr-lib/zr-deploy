@@ -5,8 +5,8 @@ const chalk = require('chalk');
 const ora = require('ora');
 const zipper = require('zip-local');
 const { promisify } = require('util');
-const { textError } = require('./utils/textConsole');
 const { resolvePath } = require('./utils');
+const { textError } = require('./utils/textConsole');
 
 /**
  * 压缩打包好的项目

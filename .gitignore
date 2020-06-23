@@ -1,5 +1,8 @@
 .DS_Store
-node_modules
+/node_modules
+
+/testDist
+testDist.zip
 
 # Log files
 npm-debug.log*
@@ -14,3 +17,5 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+

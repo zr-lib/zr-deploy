@@ -153,7 +153,7 @@ const build = spawn(cmd, params, {
   stdio: 'inherit', // 打印命令原始输出
 });
 ```
-
+ 
 ### 多个项目环境
 
 使用 [inquirer](https://www.npmjs.com/package/inquirer)，从配置文件中选择
@@ -170,7 +170,7 @@ function selectEnv(CONFIG) {
   return new Promise(async (resolve, reject) => {
     const select = await inquirer.prompt({
       type: 'list',
-      name: '选择部署的服务器',
+      name: '选择部署的配置',
       choices: CONFIG.map((item, index) => ({
         name: `${item.server.name}`,
         value: index,
@@ -333,39 +333,65 @@ module.exports = start;
 'use strict';
 
 const { promisify } = require('util');
-const { spawn } = require('child_process');
-const { textError, textSuccess } = require('./utils/textConsole');
+const ora = require('ora');
+const chalk = require('chalk');
+const { textError } = require('./utils/textConsole');
+const spawnCommand = require('./utils/spawnCommand');
 
 /**
- * 执行脚本 spawn 的封装
- * @param {*} cmd
- * @param {*} params
+ * 执行构建打包项目命令
+ * @param {*} command 命令 string
+ * @param {*} params 参数 array
  */
-async function buildDist(cmd, params, next) {
-  const build = spawn(cmd, params, {
-    shell: process.platform === 'win32', // 兼容windows系统
-    stdio: 'inherit', // 打印命令原始输出
-  });
-
-  build.on('error', () => {
-    textError(`× [script: ${cmd} ${params}] 打包失败！\n`);
-    process.exit(1);
-  });
-
-  build.on('close', (code) => {
-    if (code === 0) {
-      textSuccess('√ 打包完成！\n');
-    } else {
-      textError(`× 打包失败！[script: ${cmd} ${params}]\n`);
+async function buildDist(command, params, next) {
+  await spawnCommand(command, params)
+    .then(() => {
+      ora().succeed(chalk.green('打包完成！\n'));
+      if (next) next();
+    })
+    .catch(() => {
+      textError(`× 打包失败！[script: ${command} ${params}]\n`);
       process.exit(1);
-    }
-    // 必传，promisify 回调继续执行后续函数
-    if (next) next();
-  });
+    });
 }
 
 module.exports = promisify(buildDist);
 ```
+
+### spawn 封装
+```js
+// src\utils\spawnCommand.js
+const { spawn } = require('child_process');
+
+/**
+ * spawnCommand 执行shell命令
+ * @param {*} command 命令 string
+ * @param {*} params 参数 array
+ * @param {*} cwd 工作路径
+ * @example spawnCommand('yarn', ['build], process.cwd())
+ */
+const spawnCommand = (command, params, cwd) => {
+  return new Promise((resolve, reject) => {
+    const result = spawn(command, params, {
+      cwd,
+      stdio: 'inherit', // 打印命令原始输出
+      shell: process.platform === 'win32', // 兼容windows系统
+    });
+
+    result.on('error', (err) => {
+      reject(err);
+    });
+
+    result.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(code);
+    });
+  });
+};
+
+module.exports = spawnCommand;
+```
+
 
 ## 压缩文件 compressDist
 
@@ -378,8 +404,8 @@ const chalk = require('chalk');
 const ora = require('ora');
 const zipper = require('zip-local');
 const { promisify } = require('util');
-const { textError } = require('./utils/textConsole');
 const { resolvePath } = require('./utils');
+const { textError } = require('./utils/textConsole');
 
 /**
  * 压缩打包好的项目
@@ -424,8 +450,7 @@ const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const getTime = require('./utils/getTime');
-const { resolvePath } = require('./utils');
+const { resolvePath, getTime } = require('./utils');
 const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();
@@ -488,8 +513,7 @@ const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const getTime = require('./utils/getTime');
-const { resolvePath } = require('./utils');
+const { resolvePath, getTime } = require('./utils');
 const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();

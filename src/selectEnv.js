@@ -8,7 +8,7 @@ function selectEnv(CONFIG) {
   return new Promise(async (resolve, reject) => {
     const select = await inquirer.prompt({
       type: 'list',
-      name: '选择部署的服务器',
+      name: '选择部署的配置',
       choices: CONFIG.map((item, index) => ({
         name: `${item.server.name}`,
         value: index,

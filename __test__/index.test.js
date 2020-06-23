@@ -1,11 +1,9 @@
-const getConfigTest = require('./getConfig.t');
-const buildDistTest = require('./buildDist.t');
-const compressDistTest = require('./compressDist.t');
+const getConfigTest = require('./getConfigTest');
+const buildDistTest = require('./buildDistTest');
+const compressDistTest = require('./compressDistTest');
 
-async function testStart() {
-  await getConfigTest();
-  await buildDistTest();
-  // await compressDistTest();
-}
-
-testStart();
+describe('[===== zr-deploy -- testing =====]', () => {
+  getConfigTest();
+  buildDistTest();
+  compressDistTest();
+});

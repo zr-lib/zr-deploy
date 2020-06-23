@@ -4,8 +4,7 @@ const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const getTime = require('./utils/getTime');
-const { resolvePath } = require('./utils');
+const { resolvePath, getTime } = require('./utils');
 const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();

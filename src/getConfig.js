@@ -1,6 +1,6 @@
 const fs = require('fs');
-const { textInfo, textError } = require('./utils/textConsole');
 const { resolvePath } = require('./utils');
+const { textInfo, textError } = require('./utils/textConsole');
 
 // 获取配置
 function getConfig(testConfigJSON = null) {
