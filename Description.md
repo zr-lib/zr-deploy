@@ -120,10 +120,11 @@ zr-deploy
 ├── README.md
 ├── README_zh.md
 ├── __test__
-│   ├── buildDist.t.js
-│   ├── compressDist.t.js
-│   ├── getConfig.t.js
+│   ├── buildDistTest.js
+│   ├── compressDistTest.js
+│   ├── getConfigTest.js
 │   ├── index.test.js
+│   ├── utils.test.js
 │   └── zr-deploy-config.json
 ├── bin
 │   └── zr-deploy.js
@@ -137,8 +138,8 @@ zr-deploy
     ├── index.js
     ├── selectEnv.js
     └── utils
-        ├── getTime.js
         ├── index.js
+        ├── spawnCommand.js
         └── textConsole.js
 ```
 
@@ -153,7 +154,7 @@ const build = spawn(cmd, params, {
   stdio: 'inherit', // 打印命令原始输出
 });
 ```
- 
+
 ### 多个项目环境
 
 使用 [inquirer](https://www.npmjs.com/package/inquirer)，从配置文件中选择
@@ -359,6 +360,7 @@ module.exports = promisify(buildDist);
 ```
 
 ### spawn 封装
+
 ```js
 // src\utils\spawnCommand.js
 const { spawn } = require('child_process');
@@ -368,7 +370,7 @@ const { spawn } = require('child_process');
  * @param {*} command 命令 string
  * @param {*} params 参数 array
  * @param {*} cwd 工作路径
- * @example spawnCommand('yarn', ['build], process.cwd())
+ * @example spawnCommand('yarn', ['build'], process.cwd())
  */
 const spawnCommand = (command, params, cwd) => {
   return new Promise((resolve, reject) => {
@@ -391,7 +393,6 @@ const spawnCommand = (command, params, cwd) => {
 
 module.exports = spawnCommand;
 ```
-
 
 ## 压缩文件 compressDist
 

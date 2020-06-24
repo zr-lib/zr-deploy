@@ -5,7 +5,7 @@ const { spawn } = require('child_process');
  * @param {*} command 命令 string
  * @param {*} params 参数 array
  * @param {*} cwd 工作路径
- * @example spawnCommand('yarn', ['build], process.cwd())
+ * @example spawnCommand('yarn', ['build'], process.cwd())
  */
 const spawnCommand = (command, params, cwd) => {
   return new Promise((resolve, reject) => {
