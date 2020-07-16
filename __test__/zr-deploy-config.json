@@ -3,10 +3,11 @@
     "local": {
       "buildCommand": "mkdir testDist",
       "distDir": "./testDist",
-      "distZip": "./testDist.zip"
+      "distZip": "./testDist.zip",
+      "tipsLang": "zh"
     },
     "server": {
-      "name": "服务器1",
+      "name": "server1",
       "host": "0.0.0.0",
       "username": "username",
       "password": "password",

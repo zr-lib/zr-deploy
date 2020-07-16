@@ -12,13 +12,16 @@ const spawnCommand = require('./utils/spawnCommand');
  * @param {*} params 参数 array
  */
 async function buildDist(command, params, next) {
+  const { buildSuccess, buildFailed } = global.tips[global.tipsLang];
   await spawnCommand(command, params)
     .then(() => {
-      ora().succeed(chalk.green('打包完成！\n'));
+      // 空换行
+      console.log('');
+      ora().succeed(chalk.green(`${buildSuccess}\n`));
       if (next) next();
     })
     .catch(() => {
-      textError(`× 打包失败！[script: ${command} ${params}]\n`);
+      textError(`× ${buildFailed}[script: ${command} ${params}]\n`);
       process.exit(1);
     });
 }

@@ -1,0 +1,23 @@
+module.exports = {
+  title: 'Auto Deploy Project',
+  selectConfig: 'Select Config:',
+  notExist: 'not exist!',
+  addConfigJson:
+    'Please create "zr-deploy-config.json" in the project root directory first, eg: ',
+  configIncorrect: 'Configuration is incorrect!',
+  needKeys: 'need keys: ',
+  buildSuccess: 'Build Success!',
+  buildFailed: 'Build Failed!',
+  compressing: 'Compressing',
+  compressSuccess: 'Compress Success!',
+  compressFailed: 'Compress Failed!',
+  buildDist: 'Build Dist',
+  connectingServer: 'Connecting Server',
+  connectedServer: 'Connected Server!',
+  connectServerFailed: 'Connect Server Failed!',
+  distDirRule: 'Must be an absolute path and cannot be the root directory "/"',
+  deploying: 'deploying',
+  deploySuccess: 'Deploy Success!',
+  deployFailed: 'Deploy Failed!',
+  projectPath: 'Project path: ',
+};

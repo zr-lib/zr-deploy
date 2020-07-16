@@ -15,13 +15,20 @@ const SSH = new node_ssh();
  * @param {*} params { host, username, password }
  */
 async function connectServer(params) {
-  const spinner = ora(chalk.cyan('正在连接服务器...\n')).start();
+  const {
+    connectingServer,
+    connectedServer,
+    connectServerFailed,
+  } = global.tips[global.tipsLang];
+
+  const spinner = ora(chalk.cyan(`${connectingServer}...\n`)).start();
+
   await SSH.connect(params)
     .then(() => {
-      spinner.succeed(chalk.green('服务器连接成功！\n'));
+      spinner.succeed(chalk.green(`${connectedServer}\n`));
     })
     .catch((err) => {
-      spinner.fail(chalk.red('服务器连接失败！\n'));
+      spinner.fail(chalk.red(`${connectServerFailed}\n`));
       textError(err);
       process.exit(1);
     });
@@ -44,6 +51,14 @@ async function runCommand(cmd, cwd) {
 /* =================== 4、部署项目 =================== */
 async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   const {
+    configIncorrect,
+    deploying,
+    deploySuccess,
+    deployFailed,
+    projectPath,
+  } = global.tips[global.tipsLang];
+
+  const {
     host,
     username,
     password,
@@ -53,11 +68,11 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   } = SERVER_CONFIG;
 
   if (!host || !username || !password || !distDir || !distZipName) {
-    textError('请正确配置zr-deploy-config.json!');
+    textError(`zr-deploy-config.json ${configIncorrect}`);
     process.exit(1);
   }
   if (!distDir.startsWith('/') || distDir === '/') {
-    textError(`[server.distDir: ${distDir}] 需为绝对路径，且不能为根目录"/"`);
+    textError(`[server.distDir: ${distDir}] ${distDirRule}`);
     process.exit(1);
   }
 
@@ -65,7 +80,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   await connectServer({ host, username, password });
   // privateKey: '/home/steel/.ssh/id_rsa'
 
-  const spinner = ora(chalk.cyan('正在部署项目...\n')).start();
+  const spinner = ora(chalk.cyan(`${deploying}...\n`)).start();
 
   try {
     // 上传压缩的项目文件
@@ -94,13 +109,13 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     // 删除服务器上的压缩的项目文件
     await runCommand(`rm -rf ./${distZipName}.zip`, distDir);
 
-    spinner.succeed(chalk.green('部署完成！\n'));
-    textInfo(`项目路径: ${distDir}`);
+    spinner.succeed(chalk.green(`${deploySuccess}\n`));
+    textInfo(`${projectPath} ${distDir}`);
     textInfo(new Date());
     textInfo('');
     if (next) next();
   } catch (err) {
-    spinner.fail(chalk.red('项目部署失败！\n'));
+    spinner.fail(chalk.red(`${deployFailed}\n`));
     textError(`catch: ${err}`);
     process.exit(1);
   }

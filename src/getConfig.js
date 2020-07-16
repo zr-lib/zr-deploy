@@ -1,22 +1,25 @@
 const fs = require('fs');
 const { resolvePath } = require('./utils');
 const { textInfo, textError } = require('./utils/textConsole');
+const tips = require('./tips');
 
 // 获取配置
 function getConfig(testConfigJSON = null) {
+  const { notExist, addConfigJson, needKeys } = tips.en;
+
   const configFile = resolvePath(process.cwd(), './zr-deploy-config.json');
   if (!testConfigJSON && !fs.existsSync(configFile)) {
-    textError(`${configFile} 不存在！`);
-    textInfo(`请先在项目根目录新建"zr-deploy-config.json"，内容如下：
+    textError(`${configFile} ${notExist}`);
+    textInfo(`${addConfigJson}
     [
       {
         "local": {
           "buildCommand": "yarn build",
-          "distDir": "./docs",
+          "distDir": "./dist",
           "distZip": "./dist.zip"
         },
         "server": {
-          "name": "服务器1",
+          "name": "server1",
           "host": "1.1.1.1",
           "username": "username",
           "password": "password",
@@ -25,7 +28,7 @@ function getConfig(testConfigJSON = null) {
           "bakeup": false
         }
       }
-    ]
+    ]    
     `);
     process.exit(1);
   }
@@ -54,11 +57,11 @@ function getConfig(testConfigJSON = null) {
       return !hasAllLocalKey || !hasAllServerKey;
     });
     if (someError) {
-      textError('zr-deploy-config.json 配置不正确！\n');
+      textError(`zr-deploy-config.json ${configIncorrect}\n`);
       textInfo(
-        `local需要的字段：{${localKeys.join(
+        `local${needKeys}{${localKeys.join(
           ', '
-        )}}，server需要的字段：{${serverKeys.join(', ')}}\n`
+        )}}，server${needKeys}{${serverKeys.join(', ')}}\n`
       );
       process.exit(1);
     }

@@ -9,6 +9,7 @@ const selectEnv = require('./selectEnv');
 const buildDist = require('./buildDist');
 const compressDist = require('./compressDist');
 const deploy = require('./deploy');
+const tips = require('./tips');
 
 /* =================== 0、获取配置 =================== */
 
@@ -22,11 +23,18 @@ const deploy = require('./deploy');
 
 /* =================== 5、部署项目 =================== */
 
+global.tips = tips;
+const langs = ['zh', 'en'];
+
 async function start() {
   const CONFIG = await selectEnv(getConfig());
   if (!CONFIG) process.exit(1);
 
-  textTitle('======== 自动部署项目 ========');
+  global.tipsLang = langs.includes(CONFIG.local.tipsLang)
+    ? CONFIG.local.tipsLang
+    : 'zh';
+
+  textTitle(`======== ${tips[global.tipsLang].title} ========`);
   textInfo('');
 
   const [npm, ...script] = CONFIG.local.buildCommand.split(' ');

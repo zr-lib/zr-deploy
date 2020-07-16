@@ -5,10 +5,12 @@ const inquirer = require('inquirer');
  * @param {*} CONFIG 配置文件内容
  */
 function selectEnv(CONFIG) {
+  const { selectConfig } = global.tips.en;
+
   return new Promise(async (resolve, reject) => {
     const select = await inquirer.prompt({
       type: 'list',
-      name: '选择部署的配置',
+      name: selectConfig,
       choices: CONFIG.map((item, index) => ({
         name: `${item.server.name}`,
         value: index,

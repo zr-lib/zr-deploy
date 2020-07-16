@@ -17,5 +17,32 @@ zr-deploy
 ```
 
 
+## zr-deploy-config.json
+
+- tipsLang: 可选，值：`en` | `zh`；默认 `zh`
+
+```json
+[
+  {
+    "local": {
+      "buildCommand": "yarn build",
+      "distDir": "./docs",
+      "distZip": "./docs.zip",
+      "tipsLang": "en"
+    },
+    "server": {
+      "name": "server1",
+      "host": "1.1.1.1",
+      "username": "username",
+      "password": "password",
+      "distDir": "/var/www/xxx/xxx",
+      "distZipName": "dist",
+      "bakeup": false
+    }
+  }
+]
+```
+
+
 ## 说明
 [Description.md](./Description.md)

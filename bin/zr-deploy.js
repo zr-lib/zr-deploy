@@ -10,5 +10,9 @@ const start = require('../src/index.js');
   const styleDesc = chalk.cyan(chalk.bold(desc));
   console.log(styleDesc, `[${process.cwd()}]`, '\n');
 
-  start();
+  try {
+    start();
+  } catch (err) {
+    console.error(err);
+  }
 })();
