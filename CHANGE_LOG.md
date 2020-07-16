@@ -14,6 +14,6 @@
 - fix: bakeup time
 - change: Description.md
 
-## v1.1.8
+## v1.1.9
 
 - feat: optional tips languange: `local.tipsLang` in `zr-deploy-config.json`; <br> default `zh`, path: `src/tips/`
