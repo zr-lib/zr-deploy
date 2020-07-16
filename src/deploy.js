@@ -63,6 +63,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     username,
     password,
     distDir,
+    distDirRule,
     distZipName,
     bakeup,
   } = SERVER_CONFIG;
