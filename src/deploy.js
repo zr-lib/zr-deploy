@@ -52,6 +52,7 @@ async function runCommand(cmd, cwd) {
 async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   const {
     configIncorrect,
+    distDirRule,
     deploying,
     deploySuccess,
     deployFailed,
@@ -63,7 +64,6 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     username,
     password,
     distDir,
-    distDirRule,
     distZipName,
     bakeup,
   } = SERVER_CONFIG;
