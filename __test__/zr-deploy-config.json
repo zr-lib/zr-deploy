@@ -3,8 +3,7 @@
     "local": {
       "buildCommand": "mkdir testDist",
       "distDir": "./testDist",
-      "distZip": "./testDist.zip",
-      "tipsLang": "zh"
+      "distZip": "./testDist.zip"
     },
     "server": {
       "name": "server1",

@@ -19,7 +19,14 @@ function getConfigTest() {
     const configFile = fs.readFileSync(
       resolvePath(__dirname, './zr-deploy-config.json')
     );
+    const langs = Object.keys(global.tips);
     const config = getConfig(configFile);
+
+    global.tipsLang = config[0].local.tipsLang
+      ? langs.includes(config[0].local.tipsLang)
+        ? config[0].local.tipsLang
+        : 'en'
+      : 'zh';
 
     const configLocalKeys = Object.keys(config[0].local);
     const configServerKeys = Object.keys(config[0].server);

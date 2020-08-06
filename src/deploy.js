@@ -4,7 +4,7 @@ const { promisify } = require('util');
 const ora = require('ora');
 const chalk = require('chalk');
 const node_ssh = require('node-ssh');
-const { resolvePath, getTime } = require('./utils');
+const { resolvePath, getTime, getTips } = require('./utils');
 const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();
@@ -15,20 +15,16 @@ const SSH = new node_ssh();
  * @param {*} params { host, username, password }
  */
 async function connectServer(params) {
-  const {
-    connectingServer,
-    connectedServer,
-    connectServerFailed,
-  } = global.tips[global.tipsLang];
-
-  const spinner = ora(chalk.cyan(`${connectingServer}...\n`)).start();
+  const spinner = ora(
+    chalk.cyan(`${getTips('connectingServer')}...\n`)
+  ).start();
 
   await SSH.connect(params)
     .then(() => {
-      spinner.succeed(chalk.green(`${connectedServer}\n`));
+      spinner.succeed(chalk.green(`${getTips('connectedServer')}\n`));
     })
     .catch((err) => {
-      spinner.fail(chalk.red(`${connectServerFailed}\n`));
+      spinner.fail(chalk.red(`${getTips('connectServerFailed')}\n`));
       textError(err);
       process.exit(1);
     });
@@ -51,15 +47,6 @@ async function runCommand(cmd, cwd) {
 /* =================== 4、部署项目 =================== */
 async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   const {
-    configIncorrect,
-    distDirRule,
-    deploying,
-    deploySuccess,
-    deployFailed,
-    projectPath,
-  } = global.tips[global.tipsLang];
-
-  const {
     host,
     username,
     password,
@@ -69,11 +56,11 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   } = SERVER_CONFIG;
 
   if (!host || !username || !password || !distDir || !distZipName) {
-    textError(`zr-deploy-config.json ${configIncorrect}`);
+    textError(`zr-deploy-config.json ${getTips('configIncorrect')}`);
     process.exit(1);
   }
   if (!distDir.startsWith('/') || distDir === '/') {
-    textError(`[server.distDir: ${distDir}] ${distDirRule}`);
+    textError(`[server.distDir: ${distDir}] ${getTips('distDirRule')}`);
     process.exit(1);
   }
 
@@ -81,7 +68,7 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   await connectServer({ host, username, password });
   // privateKey: '/home/steel/.ssh/id_rsa'
 
-  const spinner = ora(chalk.cyan(`${deploying}...\n`)).start();
+  const spinner = ora(chalk.cyan(`${getTips('deploying')}...\n`)).start();
 
   try {
     // 上传压缩的项目文件
@@ -110,13 +97,13 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     // 删除服务器上的压缩的项目文件
     await runCommand(`rm -rf ./${distZipName}.zip`, distDir);
 
-    spinner.succeed(chalk.green(`${deploySuccess}\n`));
-    textInfo(`${projectPath} ${distDir}`);
+    spinner.succeed(chalk.green(`${getTips('deploySuccess')}\n`));
+    textInfo(`${getTips('projectPath')} ${distDir}`);
     textInfo(new Date());
     textInfo('');
     if (next) next();
   } catch (err) {
-    spinner.fail(chalk.red(`${deployFailed}\n`));
+    spinner.fail(chalk.red(`${getTips('deployFailed')}\n`));
     textError(`catch: ${err}`);
     process.exit(1);
   }

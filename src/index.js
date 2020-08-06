@@ -24,14 +24,16 @@ const tips = require('./tips');
 /* =================== 5、部署项目 =================== */
 
 global.tips = tips;
-const langs = ['zh', 'en'];
+const langs = Object.keys(tips);
 
 async function start() {
   const CONFIG = await selectEnv(getConfig());
   if (!CONFIG) process.exit(1);
 
-  global.tipsLang = langs.includes(CONFIG.local.tipsLang)
-    ? CONFIG.local.tipsLang
+  global.tipsLang = CONFIG.local.tipsLang
+    ? langs.includes(CONFIG.local.tipsLang)
+      ? CONFIG.local.tipsLang
+      : 'en'
     : 'zh';
 
   textTitle(`======== ${tips[global.tipsLang].title} ========`);

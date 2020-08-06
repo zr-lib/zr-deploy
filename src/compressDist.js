@@ -5,7 +5,7 @@ const chalk = require('chalk');
 const ora = require('ora');
 const zipper = require('zip-local');
 const { promisify } = require('util');
-const { resolvePath } = require('./utils');
+const { resolvePath, getTips } = require('./utils');
 const { textError } = require('./utils/textConsole');
 
 /**
@@ -15,33 +15,27 @@ const { textError } = require('./utils/textConsole');
  */
 function compressDist(LOCAL_CONFIG, next) {
   try {
-    const {
-      compressFailed,
-      buildDist,
-      configIncorrect,
-      notExist,
-      compressing,
-      compressSuccess,
-    } = global.tips[global.tipsLang];
     const { distDir, distZip } = LOCAL_CONFIG;
     const dist = resolvePath(process.cwd(), distDir);
 
     if (!fs.existsSync(dist)) {
-      textError(`× ${compressFailed}`);
+      textError(`× ${getTips('compressFailed')}`);
       textError(
-        `× ${buildDist} [local.distDir] ${configIncorrect} ${dist} ${notExist}\n`
+        `× ${getTips('buildDist')} [local.distDir] ${getTips(
+          'configIncorrect'
+        )} ${dist} ${getTips('notExist')}\n`
       );
       process.exit(1);
     }
 
-    const spinner = ora(chalk.cyan(`${compressing}...\n`)).start();
+    const spinner = ora(chalk.cyan(`${getTips('compressing')}...\n`)).start();
 
     zipper.sync.zip(dist).compress().save(resolvePath(process.cwd(), distZip));
 
-    spinner.succeed(chalk.green(`${compressSuccess}\n`));
+    spinner.succeed(chalk.green(`${getTips('compressSuccess')}\n`));
     if (next) next();
   } catch (err) {
-    textError(`${compressFailed}`, err);
+    textError(`${getTips('compressFailed')}`, err);
   }
 }
 

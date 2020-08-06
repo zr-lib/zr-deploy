@@ -1,16 +1,15 @@
+'use strict';
+
 const fs = require('fs');
-const { resolvePath } = require('./utils');
+const { resolvePath, getTips } = require('./utils');
 const { textInfo, textError } = require('./utils/textConsole');
-const tips = require('./tips');
 
 // 获取配置
 function getConfig(testConfigJSON = null) {
-  const { notExist, addConfigJson, needKeys } = tips.en;
-
   const configFile = resolvePath(process.cwd(), './zr-deploy-config.json');
   if (!testConfigJSON && !fs.existsSync(configFile)) {
-    textError(`${configFile} ${notExist}`);
-    textInfo(`${addConfigJson}
+    textError(`${configFile} ${getTips('notExist')}`);
+    textInfo(`${getTips('addConfigJson')}
     [
       {
         "local": {
@@ -59,9 +58,9 @@ function getConfig(testConfigJSON = null) {
     if (someError) {
       textError(`zr-deploy-config.json ${configIncorrect}\n`);
       textInfo(
-        `local${needKeys}{${localKeys.join(
-          ', '
-        )}}，server${needKeys}{${serverKeys.join(', ')}}\n`
+        `local${getTips('needKeys')}{${localKeys.join(', ')}}，server${getTips(
+          'needKeys'
+        )}{${serverKeys.join(', ')}}\n`
       );
       process.exit(1);
     }

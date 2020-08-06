@@ -17,3 +17,7 @@
 ## v1.2.0
 
 - feat: optional tips languange: `local.tipsLang` in `zr-deploy-config.json`; <br> default `zh`, path: `src/tips/`
+
+## 1.2.2
+
+- fix: tipsLang error

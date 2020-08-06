@@ -1,3 +1,5 @@
+'use strict';
+
 const path = require('path');
 
 /**
@@ -16,4 +18,14 @@ exports.getTime = function getTime() {
   const date = _Date.toLocaleDateString();
   const time = _Date.toTimeString().split(' ')[0].replace(/\:/g, '-');
   return `${date}_${time}`;
+};
+
+/**
+ * 打印提示
+ * @param {*} name tips name
+ */
+exports.getTips = function (name) {
+  const langConfig = global.tips[global.tipsLang];
+  if (langConfig) return langConfig[name];
+  return global.tips.en[name];
 };

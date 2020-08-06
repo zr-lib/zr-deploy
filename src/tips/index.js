@@ -1,3 +1,5 @@
+'use strict';
+
 const zh = require('./zh');
 const en = require('./en');
 

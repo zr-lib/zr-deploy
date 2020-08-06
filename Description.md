@@ -147,6 +147,8 @@ zr-deploy
 
 ```js
 // src/buildDist.js
+'use strict';
+
 const { spawn } = require('child_process');
 
 const build = spawn(cmd, params, {
@@ -161,6 +163,8 @@ const build = spawn(cmd, params, {
 
 ```js
 // src\selectEnv.js
+'use strict';
+
 const inquirer = require('inquirer');
 
 /**
@@ -239,6 +243,8 @@ yarn add node-ssh
 
 ```js
 // src\deploy.js
+'use strict';
+
 const node_ssh = require('node-ssh');
 
 const SSH = new node_ssh();
@@ -363,6 +369,8 @@ module.exports = promisify(buildDist);
 
 ```js
 // src\utils\spawnCommand.js
+'use strict';
+
 const { spawn } = require('child_process');
 
 /**
