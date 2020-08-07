@@ -56,7 +56,7 @@ function getConfig(testConfigJSON = null) {
       return !hasAllLocalKey || !hasAllServerKey;
     });
     if (someError) {
-      textError(`zr-deploy-config.json ${configIncorrect}\n`);
+      textError(`zr-deploy-config.json ${getTips('configIncorrect')}\n`);
       textInfo(
         `local${getTips('needKeys')}{${localKeys.join(', ')}}，server${getTips(
           'needKeys'
