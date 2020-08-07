@@ -1,5 +1,8 @@
 const path = require('path');
-const { resolvePath, getTime } = require('../src/utils');
+const { resolvePath, getTime, getTips } = require('../src/utils');
+const tips = require('../src/tips');
+
+global.tips = tips;
 
 describe('[===== utils testing =====]', () => {
   it('getTime test', () => {
@@ -22,5 +25,21 @@ describe('[===== utils testing =====]', () => {
     const path_resolve = path.resolve(__dirname, './utils.test.js');
     const resolve_path = resolvePath(__dirname, './utils.test.js');
     expect(path_resolve === resolve_path).toBe(true);
+  });
+
+  it('getTips test', () => {
+    expect(getTips('1')).toBe(undefined);
+
+    global.tipsLang = 'en';
+    expect(getTips('notExist')).toBe('not exist!');
+
+    global.tipsLang = 'en1';
+    expect(getTips('notExist')).toBe('not exist!');
+
+    global.tipsLang = 'zh';
+    expect(getTips('notExist')).toBe('不存在！');
+
+    global.tipsLang = undefined;
+    expect(getTips('notExist')).toBe('not exist!');
   });
 });
