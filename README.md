@@ -4,6 +4,8 @@
 
 Web FrontEnd Spa, deploy script
 
+> In fact, as long as it is an npm project (with package.json), it can generally be used
+
 ## Install
 
 ```shell
@@ -20,7 +22,22 @@ zr-deploy
 
 ## zr-deploy-config.json
 
-- tipsLang: opntional, value: `en` | `zh`; default `zh`
+- `local`
+
+  - `buildCommand`: command in "scripts" in `package.json`
+  - `distDir`: build output path
+  - `distZip`: build output file/folder zip
+  - `tipsLang`: opntional, value: `en` | `zh`; use `zh` when not provide
+
+* `server`
+
+  - `name`: name
+  - `host`: server IP
+  - `username`: server login username
+  - `password`: server login password
+  - `distDir`: server preject path
+  - `distZipName`: zip filename of upload
+  - `bakeup`: bakeup or not
 
 ```json
 [
