@@ -98,6 +98,9 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     await runCommand(`rm -rf ./${distZipName}.zip`, distDir);
 
     spinner.succeed(chalk.green(`${getTips('deploySuccess')}\n`));
+
+    await SSH.dispose();
+
     textInfo(`${getTips('projectPath')} ${distDir}`);
     textInfo(new Date());
     textInfo('');

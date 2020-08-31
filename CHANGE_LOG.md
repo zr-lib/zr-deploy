@@ -18,6 +18,10 @@
 
 - feat: optional tips languange: `local.tipsLang` in `zr-deploy-config.json`; <br> default `zh`, path: `src/tips/`
 
-## 1.2.2
+## v1.2.2
 
 - fix: tipsLang error
+
+## v1.2.6
+
+- fix: close `ssh` before `process.exit()`;
