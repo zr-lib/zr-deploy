@@ -33,6 +33,7 @@ zr-deploy
 
   - `name`: 选择的名字
   - `host`: 服务器 IP
+  - `port`：服务器端口
   - `username`: 服务器的登录用户名
   - `password`: 对应用户名的密码
   - `distDir`: 项目路径
@@ -51,6 +52,7 @@ zr-deploy
     "server": {
       "name": "server1",
       "host": "1.1.1.1",
+      "port": "22",
       "username": "username",
       "password": "password",
       "distDir": "/var/www/xxx/xxx",

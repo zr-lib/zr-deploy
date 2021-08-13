@@ -33,6 +33,7 @@ zr-deploy
 
   - `name`: name
   - `host`: server IP
+  - `port`: server port
   - `username`: server login username
   - `password`: server login password
   - `distDir`: server preject path
@@ -50,6 +51,7 @@ zr-deploy
     },
     "server": {
       "name": "server1",
+      "port": "22",
       "host": "1.1.1.1",
       "username": "username",
       "password": "password",

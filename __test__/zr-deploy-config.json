@@ -8,6 +8,7 @@
     "server": {
       "name": "server1",
       "host": "0.0.0.0",
+      "port": "22",
       "username": "username",
       "password": "password",
       "distDir": "/var/www/xxx/xxx",

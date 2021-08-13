@@ -8,6 +8,7 @@ function getConfigTest() {
   const serverKeys = [
     'name',
     'host',
+    'port',
     'username',
     'password',
     'distDir',

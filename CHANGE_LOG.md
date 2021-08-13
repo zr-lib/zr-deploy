@@ -25,3 +25,7 @@
 ## v1.2.6
 
 - fix: close `ssh` before `process.exit()`;
+
+## v1.2.7
+
+- feat: ssh `port` support;
