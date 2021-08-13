@@ -15,7 +15,7 @@ exports.resolvePath = (_path, _file) => path.resolve(_path, _file);
  */
 exports.getTime = function getTime() {
   const _Date = new Date();
-  const date = _Date.toLocaleDateString();
+  const date = _Date.toJSON().split('T')[0];
   const time = _Date.toTimeString().split(' ')[0].replace(/\:/g, '-');
   return `${date}_${time}`;
 };

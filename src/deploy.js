@@ -9,10 +9,24 @@ const { textError, textInfo } = require('./utils/textConsole');
 
 const SSH = new node_ssh();
 
+/**
+ * 通过 ssh 在服务器上命令
+ * @param {*} cmd shell 命令
+ * @param {*} cwd 路径
+ */
+ async function runCommand(cmd, cwd) {
+  await SSH.execCommand(cmd, {
+    cwd,
+    onStderr(chunk) {
+      textError(`${cmd}, stderrChunk, ${chunk.toString('utf8')}`);
+    },
+  });
+}
+
 /* =================== 3、连接服务器 =================== */
 /**
  * 连接服务器
- * @param {*} params { host, username, password }
+ * @param {*} params { host, port, username, password }
  */
 async function connectServer(params) {
   const spinner = ora(
@@ -30,24 +44,11 @@ async function connectServer(params) {
     });
 }
 
-/**
- * 通过 ssh 在服务器上命令
- * @param {*} cmd shell 命令
- * @param {*} cwd 路径
- */
-async function runCommand(cmd, cwd) {
-  await SSH.execCommand(cmd, {
-    cwd,
-    onStderr(chunk) {
-      textError(`${cmd}, stderrChunk, ${chunk.toString('utf8')}`);
-    },
-  });
-}
-
 /* =================== 4、部署项目 =================== */
 async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
   const {
     host,
+    port,
     username,
     password,
     distDir,
@@ -64,9 +65,9 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     process.exit(1);
   }
 
-  // 连接服务器
-  await connectServer({ host, username, password });
   // privateKey: '/home/steel/.ssh/id_rsa'
+  // 连接服务器
+  await connectServer({ host, port, username, password });
 
   const spinner = ora(chalk.cyan(`${getTips('deploying')}...\n`)).start();
 
@@ -75,7 +76,9 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
     await SSH.putFile(
       resolvePath(process.cwd(), LOCAL_CONFIG.distZip),
       `${distDir}/${distZipName}.zip`
-    );
+    ).catch(err => {
+      console.log('[error]putFile: ', err);
+    });
 
     if (bakeup) {
       // 备份重命名原项目的文件
@@ -85,17 +88,29 @@ async function deploy(LOCAL_CONFIG, SERVER_CONFIG, next) {
       );
     } else {
       // 删除原项目的文件
-      await runCommand(`rm -rf ${distZipName}`, distDir);
+      await runCommand(`rm -rf ${distZipName}`, distDir)
+        .catch(err => {
+          console.log('[error]rmOldFile: ', err);
+        });
     }
 
     // 修改文件权限
-    await runCommand(`chmod 777 ${distZipName}.zip`, distDir);
+    await runCommand(`chmod 777 ${distZipName}.zip`, distDir)
+      .catch(err => {
+        console.log('[error]chmod: ', err);
+      });
 
     // 解压缩上传的项目文件
-    await runCommand(`unzip ./${distZipName}.zip -d ${distZipName}`, distDir);
+    await runCommand(`unzip ./${distZipName}.zip -d ${distZipName}`, distDir)
+      .catch(err => {
+        console.log('[error]unzip: ', err);
+      });
 
     // 删除服务器上的压缩的项目文件
-    await runCommand(`rm -rf ./${distZipName}.zip`, distDir);
+    await runCommand(`rm -rf ./${distZipName}.zip`, distDir)
+      .catch(err => {
+        console.log('[error]rmzip: ', err);
+      });
 
     spinner.succeed(chalk.green(`${getTips('deploySuccess')}\n`));
 

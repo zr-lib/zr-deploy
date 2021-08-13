@@ -20,6 +20,7 @@ function getConfig(testConfigJSON = null) {
         "server": {
           "name": "server1",
           "host": "1.1.1.1",
+          "port": "22",
           "username": "username",
           "password": "password",
           "distDir": "/var/www/xxx/xxx",
@@ -38,6 +39,7 @@ function getConfig(testConfigJSON = null) {
     const serverKeys = [
       'name',
       'host',
+      'port',
       'username',
       'password',
       'distDir',
