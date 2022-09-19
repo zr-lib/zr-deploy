@@ -19,7 +19,7 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "inquirer": "^7.2.0",
-    "node-ssh": "^10.0.2",
+    "node-ssh": "^13.0.0",
     "ora": "^4.0.4",
     "zip-local": "^0.3.4"
   },
